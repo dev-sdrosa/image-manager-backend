@@ -1,6 +1,8 @@
 import { BaseEntity } from 'src/models/entity/base/base.model';
 import { DeepPartial, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 
+
+// Repository implicate another layer between Nest services, this allows services generics (Http, ORM requests, etc)
 export abstract class BaseRepository<T extends BaseEntity> {
   constructor(private readonly repository: Repository<T>) {}
 

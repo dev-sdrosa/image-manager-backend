@@ -4,6 +4,8 @@ import { UserService } from './api/providers/user/user.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configuration } from './config';
+import { ApiModule } from './api/api.module';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -12,6 +14,7 @@ import { configuration } from './config';
       isGlobal: true,
       load: [configuration],
     }),
+
     // Database
     TypeOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
@@ -19,6 +22,15 @@ import { configuration } from './config';
       }),
       inject: [ConfigService],
     }),
+    // Api
+    ApiModule,
+
+    // Api Routing
+    RouterModule.register([{
+      path: 'api',
+      module: ApiModule,
+    }]),
+    
   ],
   providers: [AppService, UserService],
 })
