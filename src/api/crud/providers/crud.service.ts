@@ -2,7 +2,7 @@ import { BaseEntity } from 'src/common/entities/base.model';
 import { Repository } from 'typeorm';
 
 export abstract class CrudService<T extends BaseEntity> {
-  constructor(private readonly repository: Repository<T>) {}
+  constructor(public readonly repository: Repository<T>) {}
 
   async findAll(): Promise<T[]> {
     return await this.repository.find();
@@ -17,12 +17,12 @@ export abstract class CrudService<T extends BaseEntity> {
     return await this.repository.save(entity);
   }
 
-  async update(id: string, data: any): Promise<T> {
+  async update(id: number, data: any): Promise<T> {
     await this.repository.update(id, data);
     return this.findById(id);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.repository.delete(id);
   }
 }

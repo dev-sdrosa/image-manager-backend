@@ -35,7 +35,7 @@ const ormconfig = async (): Promise<DataSource> => {
 
   return new DataSource({
     ...config.db,
-    entities: [`${__dirname}/../src/models/entity/**/*.{js,ts}`],
+    entities: [`${__dirname}/../src/api/**/entities/*.entity.{js,ts}`],
     migrations: [`${__dirname}/../src/migration/**/*.{js,ts}`],
   });
 };
