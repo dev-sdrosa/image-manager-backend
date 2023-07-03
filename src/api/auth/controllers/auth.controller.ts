@@ -13,16 +13,49 @@ import { IAuthResult } from '../dto/auth.dto';
 import { SignInDto } from '../dto/sign-in.dto';
 import { IRefreshToken } from 'src/common/interfaces/token/refresh-token.interface';
 import { EmailDto } from '../dto/email.dto';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express-serve-static-core';
 
 @Controller('auth')
 export class AuthController {
+    private readonly cookiePath = '/api/auth';
+    private readonly cookieName: string;
+    private readonly refreshTime: number;
+    private readonly testing: boolean;
+
     constructor(
         private readonly userService: UserService,
         private readonly commonService: CommonService,
         private readonly jwtService: JwtService,
         private readonly authService: AuthService,
-        private readonly mailerService: MailerService
-    ) { }
+        private readonly mailerService: MailerService,
+        private readonly configService: ConfigService
+    ) {
+        this.cookieName = this.configService.get<string>('REFRESH_COOKIE');
+        this.refreshTime = this.configService.get<number>('jwt.refresh.time');
+        this.testing = this.configService.get<string>('NODE_ENV') !== 'production';
+    }
+
+    private refreshTokenFromReq(req: Request): string {
+        const token: string | undefined = req.signedCookies[this.cookieName];
+
+        if (!token) {
+            throw new UnauthorizedException();
+        }
+
+        return token;
+    }
+
+    private saveRefreshCookie(res: Response, refreshToken: string): Response {
+        return res.cookie(this.cookieName, refreshToken, {
+          secure: !this.testing,
+          httpOnly: true,
+          signed: true,
+          path: this.cookiePath,
+          expires: new Date(Date.now() + this.refreshTime * 1000),
+        });
+      }
+    
 
     @Post("signup")
     public async signUp(
@@ -102,26 +135,26 @@ export class AuthController {
     }
 
     // public async logout(refreshToken: string): Promise<IMessage> {
-        // Store refreshToken on Redis and remove it
+    // Store refreshToken on Redis and remove it
     // }
 
     @Post("reset-password")
     public async resetPasswordEmail(
         @Body() dto: EmailDto,
         @Param() domain?: string,
-      ): Promise<IMessage> {
+    ): Promise<IMessage> {
         const user = await this.userService.uncheckedUserByEmail(dto.email);
-    
+
         if (!user) {
-          const resetToken = await this.jwtService.generateToken(
-            user,
-            TokenTypeEnum.RESET_PASSWORD,
-            domain,
-          );
-          this.mailerService.sendResetPasswordEmail(user, resetToken);
+            const resetToken = await this.jwtService.generateToken(
+                user,
+                TokenTypeEnum.RESET_PASSWORD,
+                domain,
+            );
+            this.mailerService.sendResetPasswordEmail(user, resetToken);
         }
-    
+
         return this.commonService.generateMessage('Reset password email sent');
-      }
+    }
 
 }
