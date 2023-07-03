@@ -1,17 +1,34 @@
 export const config = {
     db: {},
-    JWT_ACCESS_TIME: process.env.JWT_ACCESS_TIME,
-    JWT_CONFIRMATION_SECRET: process.env.JWT_CONFIRMATION_SECRET,
-    JWT_CONFIRMATION_TIME: process.env.JWT_CONFIRMATION_TIME,
-    JWT_RESET_PASSWORD_SECRET: process.env.JWT_RESET_PASSWORD_SECRET,
-    JWT_RESET_PASSWORD_TIME: process.env.JWT_RESET_PASSWORD_TIME,
-    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-    JWT_REFRESH_TIME: process.env.JWT_REFRESH_TIME,
-    REFRESH_COOKIE: process.env.REFRESH_COOKIE,
-    COOKIE_SECRET: process.env.COOKIE_SECRET,
-    EMAIL_HOST: process.env.EMAIL_HOST,
-    EMAIL_PORT: process.env.EMAIL_PORT,
-    EMAIL_SECURE: process.env.EMAIL_SECURE,
-    EMAIL_USER: process.env.EMAIL_USER,
-    EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+    id: process.env.APP_ID,
+    port: parseInt(process.env.PORT, 10),
+    domain: process.env.DOMAIN,
+    jwt: {
+      access: {
+        privateKey: process.env.JWT_SECRET,
+        publicKey: process.env.JWT_SECRET,
+        time: parseInt(process.env.JWT_ACCESS_TIME, 10),
+      },
+      confirmation: {
+        secret: process.env.JWT_CONFIRMATION_SECRET,
+        time: parseInt(process.env.JWT_CONFIRMATION_TIME, 10),
+      },
+      resetPassword: {
+        secret: process.env.JWT_RESET_PASSWORD_SECRET,
+        time: parseInt(process.env.JWT_RESET_PASSWORD_TIME, 10),
+      },
+      refresh: {
+        secret: process.env.JWT_REFRESH_SECRET,
+        time: parseInt(process.env.JWT_REFRESH_TIME, 10),
+      },
+    },
+    emailService: {
+      host: process.env.EMAIL_HOST,
+      port: parseInt(process.env.EMAIL_PORT, 10),
+      secure: process.env.EMAIL_SECURE === 'true',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    },
   };
