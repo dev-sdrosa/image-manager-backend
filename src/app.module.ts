@@ -11,6 +11,7 @@ import { AuthModule } from './api/auth/auth.module';
 import { JwtModule } from './api/jwt/jwt.module';
 import { MailerModule } from './api/mailer/mailer.module';
 import { AuthGuard } from './api/auth/guards/auth.guard';
+import { ImageModule } from './api/image/image.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AuthGuard } from './api/auth/guards/auth.guard';
     UserModule,
     JwtModule,
     MailerModule,
+    ImageModule,
     AuthModule,
     
     // Api Routing
@@ -47,6 +49,10 @@ import { AuthGuard } from './api/auth/guards/auth.guard';
     {
       path: 'api',
       module: AuthModule,
+    },
+    {
+      path: 'api',
+      module: ImageModule,
     }]),
     
   ],
