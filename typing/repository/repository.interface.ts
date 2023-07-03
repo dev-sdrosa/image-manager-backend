@@ -1,4 +1,4 @@
-import { BaseEntity } from "src/models/entity/base/base.model";
+import { BaseEntity } from "src/common/entities/base.model";
 
 
 export interface IRepository<T extends BaseEntity> {

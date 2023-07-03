@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
-import { User } from 'src/models/entity/user/user.entity';
-import { UserRepository } from 'src/models/repository';
+import { User } from 'src/api/user/entities/user.entity';
+import { UserRepository } from '../repositories/user.repository';
 
 @Controller('users')
 export class UserController {

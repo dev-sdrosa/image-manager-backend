@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
-import { UserService } from './api/providers/user/user.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configuration } from './config';
-import { ApiModule } from './api/api.module';
 import { RouterModule } from '@nestjs/core';
-import { RepositoryModule } from './models/model.module';
-import { UserRepository } from './models/repository';
+import { UserModule } from './api/user/user.module';
+import { CrudModule } from './api/crud/crud.module';
 
 @Module({
   imports: [
@@ -24,12 +22,13 @@ import { UserRepository } from './models/repository';
       inject: [ConfigService],
     }),
     // Api
-    ApiModule,
+    CrudModule,
+    UserModule,
 
     // Api Routing
     RouterModule.register([{
       path: 'api',
-      module: ApiModule,
+      module: UserModule,
     }]),
     
   ],

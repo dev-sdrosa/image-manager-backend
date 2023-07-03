@@ -1,4 +1,4 @@
-import { BaseEntity } from 'src/models/entity/base/base.model';
+import { BaseEntity } from 'src/common/entities/base.model';
 import { DeepPartial, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 

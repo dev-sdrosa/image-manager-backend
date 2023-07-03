@@ -1,5 +1,5 @@
 import { Entity, Column } from 'typeorm';
-import { BaseEntity } from '../base/base.model';
+import { BaseEntity } from '../../../common/entities/base.model';
 
 
 
