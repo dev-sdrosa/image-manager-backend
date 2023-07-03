@@ -15,6 +15,12 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { IAuthResponseUser } from '../interfaces/auth-response-user.interface';
 import { UserService } from 'src/api/user/providers/user.service';
 import { AuthResponseUserMapper } from '../mappers/auth-response-user.mapper';
+import {
+    ApiBadRequestResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiBearerAuth,
+  } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -53,6 +59,15 @@ export class AuthController {
         });
     }
 
+    @ApiOkResponse({
+        description: 'Sign in successfully.',
+    })
+    @ApiBadRequestResponse({
+        description: 'Something is invalid on the request body',
+    })
+    @ApiNotFoundResponse({
+        description: 'The user is not found.',
+    })
     @Public()
     @Post('/sign-up')
     public async signUp(
@@ -62,6 +77,16 @@ export class AuthController {
         return this.authService.signUp(signUpDto, origin);
     }
 
+    @ApiOkResponse({
+        type: AuthResponseMapper,
+        description: 'Sign in successfully.',
+    })
+    @ApiBadRequestResponse({
+        description: 'Something is invalid on the request body',
+    })
+    @ApiNotFoundResponse({
+        description: 'The user is not found.',
+    })
     @Public()
     @Post('/sign-in')
     public async signIn(
@@ -75,6 +100,16 @@ export class AuthController {
             .json(AuthResponseMapper.map(result));
     }
 
+    @ApiOkResponse({
+        type: AuthResponseMapper,
+        description: 'Token refreshed',
+    })
+    @ApiBadRequestResponse({
+        description: 'Something is invalid on the request body',
+    })
+    @ApiNotFoundResponse({
+        description: 'The user is not found.',
+    })
     @Public()
     @Post('/refresh-access')
     public async refreshAccess(
@@ -91,6 +126,15 @@ export class AuthController {
             .json(AuthResponseMapper.map(result));
     }
 
+    @ApiOkResponse({
+        description: 'Token refreshed',
+    })
+    @ApiBadRequestResponse({
+        description: 'Something is invalid on the request body',
+    })
+    @ApiNotFoundResponse({
+        description: 'The user is not found.',
+    })
     @Post('/logout')
     @HttpCode(HttpStatus.OK)
     public async logout(
@@ -135,6 +179,14 @@ export class AuthController {
         return this.authService.resetPassword(resetPasswordDto);
     }
 
+    @ApiOkResponse({
+        type: AuthResponseUserMapper,
+        description: 'Current user details',
+    })
+    @ApiNotFoundResponse({
+        description: 'The user is not found.',
+    })
+    @ApiBearerAuth()
     @Get('/me')
     public async getMe(@CurrentUser() id: number): Promise<IAuthResponseUser> {
         const user = await this.userService.findOneById(id);

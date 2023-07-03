@@ -77,7 +77,7 @@ export class JwtService {
                     JwtService.generateTokenAsync({ id: user.id }, privateKey, {
                         ...jwtOptions,
                         expiresIn: accessTime,
-                        algorithm: 'RS256', // to use public and private key
+                        algorithm: 'HS256', // to use public and private key
                     }),
                 );
             case TokenTypeEnum.REFRESH:
@@ -154,7 +154,7 @@ export class JwtService {
                     JwtService.verifyTokenAsync(token, publicKey, {
                         ...jwtOptions,
                         maxAge: accessTime,
-                        algorithms: ['RS256'],
+                        algorithms: ['HS256'],
                     }),
                 );
             case TokenTypeEnum.REFRESH:

@@ -34,12 +34,7 @@ export class AuthService {
 
     this.comparePasswords(password1, password2);
 
-    const user: any = await this.userService.create({
-      email: email, 
-      name: name, 
-      username: username, 
-      password: await hash(password1, 10)
-    });
+    const user: any = await this.userService.new(email, name, password1);
     const confirmationToken = await this.jwtService.generateToken(
       user,
       TokenTypeEnum.CONFIRMATION,
@@ -159,7 +154,7 @@ export class AuthService {
       if (!emailOrUsername) {
         throw new BadRequestException('Invalid email');
       }
-
+      console.log(1)
       return this.userService.findOneByEmail(emailOrUsername);
     }
 
@@ -169,8 +164,8 @@ export class AuthService {
      ) {
       throw new BadRequestException('Invalid username');
     }
-
-    return this.userService.findOneByUsername(emailOrUsername);
+    console.log(2)
+    return this.userService.findOneByUsername(emailOrUsername, true);
   }
 
   private async generateAuthTokens(

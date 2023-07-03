@@ -22,6 +22,7 @@ export class MailerService {
         const emailConfig = this.configService.get<IEmailConfig>('emailService');
         this.transport = createTransport(emailConfig);
         this.email = `"Image Management" <${emailConfig.auth.user}>`;
+        console.log(this.email)
         this.domain = this.configService.get<string>('domain');
         this.loggerService = new Logger(MailerService.name);
         this.templates = {
@@ -47,6 +48,7 @@ export class MailerService {
         html: string,
         log?: string,
     ): void {
+        console.log('sending')
         this.transport
             .sendMail({
                 from: this.email,
@@ -63,7 +65,8 @@ export class MailerService {
         const subject = 'Confirm your email';
         const html = this.templates.confirmation({
             name,
-            link: `https://${this.domain}/auth/confirm/${token}`,
+            link: `https://${this.domain}/api/auth/confirm-email/${token}`,
+            token: token
         });
         this.sendEmail(email, subject, html, 'A new confirmation email was sent.');
     }

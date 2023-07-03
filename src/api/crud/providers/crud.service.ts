@@ -9,7 +9,7 @@ export abstract class CrudService<T extends BaseEntity> {
   }
 
   async findById(id: any): Promise<T> {
-    return await this.repository.findOne(id);
+    return await this.repository.findOne({ where: { id : id}});
   }
 
   async create(data: any): Promise<T[]> {

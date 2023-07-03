@@ -4,6 +4,7 @@ import { compare, hash } from 'bcrypt';
 import { ChangeEmailDto, ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { UserService } from '../providers/user.service';
 import { CommonService } from 'src/common/providers/common.service';
+import { CurrentUser } from 'src/api/auth/decorators/current-user.decorator';
 
 @Controller('users')
 export class UserController {
@@ -11,10 +12,9 @@ export class UserController {
     private readonly userService: UserService,
     private readonly commonService: CommonService
   ) {}
-
  
   @Delete(':id')
-  async delete(@Param('id') id: number): Promise<void> {
+  async delete(@CurrentUser() id: number,): Promise<void> {
     return this.userService.delete(id);
   }
 }

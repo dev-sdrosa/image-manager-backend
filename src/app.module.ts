@@ -43,6 +43,10 @@ import { AuthGuard } from './api/auth/guards/auth.guard';
     RouterModule.register([{
       path: 'api',
       module: UserModule,
+    },
+    {
+      path: 'api',
+      module: AuthModule,
     }]),
     
   ],

@@ -31,14 +31,14 @@ export class UserService extends CrudService<User> {
   ): Promise<User> {
     const formattedEmail = email.toLowerCase();
     await this.checkEmailUniqueness(formattedEmail);
-    const formattedName = this.commonService.formatName(name);
     const user = this.repository.create({
       email: formattedEmail,
-      name: formattedName,
-      username: formattedName,
+      name: name,
+      username: name,
       password: await hash(password, 10),
     });
-    return user;
+    
+    return user.save();
   }
 
   public async findOneById(id: number): Promise<User> {
@@ -57,7 +57,7 @@ export class UserService extends CrudService<User> {
     const user = await this.repository.findOne({
       where: { username: username.toLowerCase() }
     });
-
+    console.log(user)
     if (forAuth) {
       this.throwUnauthorizedException(user);
     } else {
@@ -128,8 +128,7 @@ export class UserService extends CrudService<User> {
     }
 
     user.confirmed = true;
-    await this.update(userId, user)
-    return user;
+    return await this.update(userId, user);
   }
 
   public async resetPassword(
