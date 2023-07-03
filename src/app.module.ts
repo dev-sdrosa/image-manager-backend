@@ -9,6 +9,7 @@ import { CrudModule } from './api/crud/crud.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './api/auth/auth.module';
 import { JwtModule } from './api/jwt/jwt.module';
+import { MailerModule } from './api/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -33,7 +34,9 @@ import { JwtModule } from './api/jwt/jwt.module';
     CrudModule,
     UserModule,
     JwtModule,
+    MailerModule,
     AuthModule,
+    
     // Api Routing
 
     RouterModule.register([{
