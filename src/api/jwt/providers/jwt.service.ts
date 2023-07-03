@@ -112,6 +112,17 @@ export class JwtService {
         }
     }
 
+    public async generateAuthTokens(
+        user: IUser,
+        domain?: string,
+        tokenId?: string,
+      ): Promise<[string, string]> {
+        return Promise.all([
+          this.generateToken(user, TokenTypeEnum.ACCESS, domain, tokenId),
+          this.generateToken(user, TokenTypeEnum.REFRESH, domain, tokenId),
+        ]);
+      }
+
     private static async throwBadRequest<
         T extends IAccessToken | IRefreshToken | IEmailToken,
     >(promise: Promise<T>): Promise<T> {

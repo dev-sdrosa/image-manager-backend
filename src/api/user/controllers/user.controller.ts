@@ -1,22 +1,20 @@
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { User } from 'src/api/user/entities/user.entity';
+import { compare, hash } from 'bcrypt';
+import { ChangeEmailDto, ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { UserService } from '../providers/user.service';
+import { CommonService } from 'src/common/providers/common.service';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly commonService: CommonService
   ) {}
 
-  @Get(':id')
-  async findById(@Param('id') id: number): Promise<User> {
-    const user = await this.userService.findById(id);
-
-    if (!user) {
-      new NotFoundException('User not found')
-    }
-    
-    return user
+ 
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<void> {
+    return this.userService.delete(id);
   }
-
 }

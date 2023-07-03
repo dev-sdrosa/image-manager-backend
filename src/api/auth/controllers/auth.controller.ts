@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ConflictException, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/api/user/entities/user.entity';
-import { compare, hash } from 'bcrypt';
-import { CommonService } from 'src/common/providers/common.service';
-import { UserService } from 'src/api/user/providers/user.service';
+import { Controller, HttpStatus, HttpCode, Res, Req, Post, Get, Body, UnauthorizedException } from '@nestjs/common';
 import { SignUpDto } from '../dto/sign-up.dto';
 import { IMessage } from 'src/common/interfaces/message.interface';
-import { JwtService } from 'src/api/jwt/providers/jwt.service';
 import { AuthService } from '../providers/auth.service';
-import { TokenTypeEnum } from 'src/common/enums/token.enum';
-import { MailerService } from 'src/api/mailer/providers/mailer.service';
-import { IAuthResult } from '../dto/auth.dto';
 import { SignInDto } from '../dto/sign-in.dto';
-import { IRefreshToken } from 'src/common/interfaces/token/refresh-token.interface';
-import { EmailDto } from '../dto/email.dto';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express-serve-static-core';
+import { Public } from '../decorators/public.decorator';
+import { Origin } from '../decorators/origin.decorator';
+import { AuthResponseMapper } from '../mappers/auth-response.mapper';
+import { ConfirmEmailDto } from '../dto/confirm-email.tdo';
+import { EmailDto } from '../dto/email.dto';
+import { ResetPasswordDto } from '../dto/password.dto';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { IAuthResponseUser } from '../interfaces/auth-response-user.interface';
+import { UserService } from 'src/api/user/providers/user.service';
+import { AuthResponseUserMapper } from '../mappers/auth-response-user.mapper';
 
 @Controller('auth')
 export class AuthController {
@@ -24,11 +24,8 @@ export class AuthController {
     private readonly testing: boolean;
 
     constructor(
-        private readonly userService: UserService,
-        private readonly commonService: CommonService,
-        private readonly jwtService: JwtService,
         private readonly authService: AuthService,
-        private readonly mailerService: MailerService,
+        private readonly userService: UserService,
         private readonly configService: ConfigService
     ) {
         this.cookieName = this.configService.get<string>('REFRESH_COOKIE');
@@ -48,113 +45,99 @@ export class AuthController {
 
     private saveRefreshCookie(res: Response, refreshToken: string): Response {
         return res.cookie(this.cookieName, refreshToken, {
-          secure: !this.testing,
-          httpOnly: true,
-          signed: true,
-          path: this.cookiePath,
-          expires: new Date(Date.now() + this.refreshTime * 1000),
+            secure: !this.testing,
+            httpOnly: true,
+            signed: true,
+            path: this.cookiePath,
+            expires: new Date(Date.now() + this.refreshTime * 1000),
         });
-      }
-    
+    }
 
-    @Post("signup")
+    @Public()
+    @Post('/sign-up')
     public async signUp(
-        @Body() dto: SignUpDto,
-        @Param() domain?: string
+        @Origin() origin: string | undefined,
+        @Body() signUpDto: SignUpDto,
     ): Promise<IMessage> {
-        const { name, email, username, password1, password2 } = dto;
-        const user = await this.userService.findByEmail(email);
-
-        if (user) {
-            throw new ConflictException('Email already in use');
-        }
-
-        this.authService.comparePasswords(password1, password2);
-        await this.userService.create({
-            name: name,
-            email: email,
-            username: username,
-            password: await hash(password1, 10),
-        });
-        const confirmationToken = await this.jwtService.generateToken(
-            user,
-            TokenTypeEnum.CONFIRMATION,
-            domain,
-        );
-        this.mailerService.sendConfirmationEmail(user, confirmationToken);
-        return this.commonService.generateMessage('Registration successful! Check your confirmation email');
+        return this.authService.signUp(signUpDto, origin);
     }
 
-    @Post("signin")
-    public async singIn(
-        @Body() dto: SignInDto,
-        @Param() domain?: string
-    ): Promise<IAuthResult> {
-        const { emailOrUsername, password } = dto;
-        const user = await this.authService.userByEmailOrUsername(emailOrUsername);
-
-        if (!(await compare(password, user.password))) {
-            throw new BadRequestException('Invalid password')
-        }
-        if (!user.confirmed) {
-            const confirmationToken = await this.jwtService.generateToken(
-                user,
-                TokenTypeEnum.CONFIRMATION,
-                domain,
-            );
-            this.mailerService.sendConfirmationEmail(user, confirmationToken);
-            throw new UnauthorizedException(
-                'Please confirm your email, a new email has been sent',
-            );
-        }
-
-        const [accessToken, refreshToken] = await this.authService.generateAuthTokens(
-            user,
-            domain,
-        );
-        return { user, accessToken, refreshToken };
+    @Public()
+    @Post('/sign-in')
+    public async signIn(
+        @Res() res: Response,
+        @Origin() origin: string | undefined,
+        @Body() singInDto: SignInDto,
+    ): Promise<void> {
+        const result = await this.authService.signIn(singInDto, origin);
+        this.saveRefreshCookie(res, result.refreshToken)
+            .status(HttpStatus.OK)
+            .json(AuthResponseMapper.map(result));
     }
 
-    @Post("refresh-token")
-    public async refreshTokenAccess(
-        @Param() refreshToken: string,
-        @Param() domain?: string,
-    ): Promise<IAuthResult> {
-        const { id, version, tokenId } =
-            await this.jwtService.verifyToken<IRefreshToken>(
-                refreshToken,
-                TokenTypeEnum.REFRESH,
-            );
-        const user = await this.userService.findById(id);
-        const [accessToken, newRefreshToken] = await this.authService.generateAuthTokens(
-            user,
-            domain,
-            tokenId,
+    @Public()
+    @Post('/refresh-access')
+    public async refreshAccess(
+        @Req() req: Request,
+        @Res() res: Response,
+    ): Promise<void> {
+        const token = this.refreshTokenFromReq(req);
+        const result = await this.authService.refreshTokenAccess(
+            token,
+            req.headers.origin,
         );
-        return { user, accessToken, refreshToken: newRefreshToken };
+        this.saveRefreshCookie(res, result.refreshToken)
+            .status(HttpStatus.OK)
+            .json(AuthResponseMapper.map(result));
     }
 
-    // public async logout(refreshToken: string): Promise<IMessage> {
-    // Store refreshToken on Redis and remove it
-    // }
+    @Post('/logout')
+    @HttpCode(HttpStatus.OK)
+    public async logout(
+        @Req() req: Request,
+        @Res() res: Response,
+    ): Promise<void> {
+        const token = this.refreshTokenFromReq(req);
+        const message = await this.authService.logout(token);
+        res
+            .clearCookie(this.cookieName, { path: this.cookiePath })
+            .status(HttpStatus.OK)
+            .json(message);
+    }
 
-    @Post("reset-password")
-    public async resetPasswordEmail(
-        @Body() dto: EmailDto,
-        @Param() domain?: string,
+    @Public()
+    @Post('/confirm-email')
+    public async confirmEmail(
+        @Body() confirmEmailDto: ConfirmEmailDto,
+        @Res() res: Response,
+    ): Promise<void> {
+        const result = await this.authService.confirmEmail(confirmEmailDto);
+        this.saveRefreshCookie(res, result.refreshToken)
+            .status(HttpStatus.OK)
+            .json(AuthResponseMapper.map(result));
+    }
+
+    @Post('/forgot-password')
+    @HttpCode(HttpStatus.OK)
+    public async forgotPassword(
+        @Origin() origin: string | undefined,
+        @Body() emailDto: EmailDto,
     ): Promise<IMessage> {
-        const user = await this.userService.uncheckedUserByEmail(dto.email);
-
-        if (!user) {
-            const resetToken = await this.jwtService.generateToken(
-                user,
-                TokenTypeEnum.RESET_PASSWORD,
-                domain,
-            );
-            this.mailerService.sendResetPasswordEmail(user, resetToken);
-        }
-
-        return this.commonService.generateMessage('Reset password email sent');
+        return this.authService.resetPasswordEmail(emailDto, origin);
     }
 
+    @Public()
+    @Post('/reset-password')
+    @HttpCode(HttpStatus.OK)
+    public async resetPassword(
+        @Body() resetPasswordDto: ResetPasswordDto,
+    ): Promise<IMessage> {
+        return this.authService.resetPassword(resetPasswordDto);
+    }
+
+    @Get('/me')
+    public async getMe(@CurrentUser() id: number): Promise<IAuthResponseUser> {
+        const user = await this.userService.findOneById(id);
+        return AuthResponseUserMapper.map(user);
+    }
 }
