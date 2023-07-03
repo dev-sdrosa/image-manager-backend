@@ -11,8 +11,8 @@ import { User } from 'src/models/entity/user/user.entity';
     TypeOrmModule.forFeature([User]),
     // Shared Modules Here
   ],
-  exports: [providers.UserService, UserRepository],
+  exports: [UserRepository, providers.UserService],
   controllers: Object.values(controllers),
-  providers: [...Object.values(providers), UserRepository],
+  providers: [UserRepository, ...Object.values(providers), ],
 })
 export class ApiModule {}

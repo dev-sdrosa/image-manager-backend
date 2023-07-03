@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configuration } from './config';
 import { ApiModule } from './api/api.module';
 import { RouterModule } from '@nestjs/core';
+import { RepositoryModule } from './models/model.module';
+import { UserRepository } from './models/repository';
 
 @Module({
   imports: [
@@ -14,7 +16,6 @@ import { RouterModule } from '@nestjs/core';
       isGlobal: true,
       load: [configuration],
     }),
-
     // Database
     TypeOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
@@ -32,6 +33,6 @@ import { RouterModule } from '@nestjs/core';
     }]),
     
   ],
-  providers: [AppService, UserService],
+  providers: [AppService],
 })
 export class AppModule {}
