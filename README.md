@@ -34,7 +34,9 @@ All packages require for this setup are inside `package.json`. Is important to k
 - On the root directory, create a `.env` file, this file will hold all the required variables to run this project (You could use the .env.example as guide):
 - To get credentials '`EMAIL_USER'` and '`EMAIL_PASSWORD'`, follow this [guide](https://miracleio.me/snippets/use-gmail-with-nodemailer/) to activate your gmail account with Nodemailer
 - To get access to Unsplash API use `UNSPLASH_CLIEND_ID='6I-YLGLIp-KO2Kh83_y4lvN8CBd3O_Eiu81VEvd2PCs'`
+- Run db migrations with `npm run migation:run`
 - After that, run `npm run start:dev` to start the project.
+  
 
 ## Room for Improvement
 
