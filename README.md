@@ -1,73 +1,50 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Image Manager Backend
+> A REST API for image file management with OAuth.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Table of Contents
+* [General Info](#general-information)
+* [Most Relevant Technologies](#most-relevant-technologies)
+* [Setup](#setup)
+* [Room for Improvement](#room-for-improvement)
+* [Contact](#contact)
+<!-- * [License](#license) -->
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## General Information
+- Complete authentication: sign-up, sign-in, forgot password, email services for account verification
+- Image management for AWS S3 uploads (And internal use)
+- Unsplash API for search external images, upload process from Unsplash image to AWS S3 bucket
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
+## Most Relevant Technologies
+- Node - version 18.16.0
+- NestJS - version 10.0.0
+- Typescript - version 5.1.3
+- TypeORM - version 0.3.17
+- Nodemailer - version 6.9.3
+- Passport-JWT - version 4.0.1
+- AWS-sdk - version 2.1409.0
+- Axios - vesion 1.4.0
 
-```bash
-$ yarn install
-```
 
-## Running the app
+## Setup
+All packages require for this setup are inside `package.json`. Is important to know that the version of Node used is 18.16.0 (nvm install 18.16.0, may work as well).
 
-```bash
-# development
-$ yarn run start
+- First run `npm install` to install required packages
+- On the root directory, create a `.env` file, this file will hold all the required variables to run this project (You could use the .env.example as guide):
+- To get credentials '`EMAIL_USER'` and '`EMAIL_PASSWORD'`, follow this [guide](https://miracleio.me/snippets/use-gmail-with-nodemailer/) to activate your gmail account with Nodemailer
+- To get access to Unsplash API use `UNSPLASH_CLIEND_ID='6I-YLGLIp-KO2Kh83_y4lvN8CBd3O_Eiu81VEvd2PCs'`
+- After that, run `npm run start:dev` to start the project.
 
-# watch mode
-$ yarn run start:dev
+## Room for Improvement
 
-# production mode
-$ yarn run start:prod
-```
+- S3 objectCopy returned permission errors, so it interrupted the operating logic of the file name update at the S3 bucket level. So the image update endpoint is inactive, this can be solved quickly since there is already a service for it.
+- The structure of the responses can be better standardized, to have a better consistency in the formats.
+- Jest unit tests.
+- Dockerization of the project.
+- Add excluded enviroment variables to ConfigService
 
-## Test
 
-```bash
-# unit tests
-$ yarn run test
+## Contact
+Created by [@sdrosa-dev]([https://www.flynerd.pl/](https://www.linkedin.com/in/sdrosa-dev/)).
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
