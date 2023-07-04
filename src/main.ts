@@ -21,11 +21,10 @@ async function bootstrap() {
     }),
   );
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('NestJS Authentication API')
-    .setDescription('A OAuth2.0 authentication API made with NestJS')
-    .setVersion('0.0.1')
+    .setTitle('NestJS Image Manager API')
+    .setDescription('A OAuth2.0 Image Manager API made with NestJS')
+    .setVersion('1.0.0')
     .addBearerAuth()
-    .addTag('Authentication API')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

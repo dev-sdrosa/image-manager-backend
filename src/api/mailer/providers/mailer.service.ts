@@ -22,7 +22,6 @@ export class MailerService {
         const emailConfig = this.configService.get<IEmailConfig>('emailService');
         this.transport = createTransport(emailConfig);
         this.email = `"Image Management" <${emailConfig.auth.user}>`;
-        console.log(this.email)
         this.domain = this.configService.get<string>('domain');
         this.loggerService = new Logger(MailerService.name);
         this.templates = {
@@ -34,7 +33,6 @@ export class MailerService {
     private static parseTemplate(
         templateName: string,
     ): Handlebars.TemplateDelegate<ITemplatedData> {
-        console.log(join(__dirname))
         const templateText = readFileSync(
             join(__dirname, '../templates', templateName),
             'utf-8', 
@@ -48,7 +46,6 @@ export class MailerService {
         html: string,
         log?: string,
     ): void {
-        console.log('sending')
         this.transport
             .sendMail({
                 from: this.email,
@@ -77,6 +74,7 @@ export class MailerService {
         const html = this.templates.resetPassword({
             name,
             link: `https://${this.domain}/auth/reset-password/${token}`,
+            token: token
         });
         this.sendEmail(
             email,

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
+  NotFoundException
 } from '@nestjs/common';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from 'src/api/jwt/providers/jwt.service';
@@ -110,6 +111,8 @@ export class AuthService {
         domain,
       );
       this.mailerService.sendResetPasswordEmail(user, resetToken);
+    } else {
+      throw new NotFoundException()
     }
 
     return this.commonService.generateMessage('Reset password email sent');
@@ -154,7 +157,6 @@ export class AuthService {
       if (!emailOrUsername) {
         throw new BadRequestException('Invalid email');
       }
-      console.log(1)
       return this.userService.findOneByEmail(emailOrUsername);
     }
 
@@ -164,7 +166,6 @@ export class AuthService {
      ) {
       throw new BadRequestException('Invalid username');
     }
-    console.log(2)
     return this.userService.findOneByUsername(emailOrUsername, true);
   }
 

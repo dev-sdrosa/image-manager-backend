@@ -161,6 +161,7 @@ export class AuthController {
             .json(AuthResponseMapper.map(result));
     }
 
+    @Public()
     @Post('/forgot-password')
     @HttpCode(HttpStatus.OK)
     public async forgotPassword(

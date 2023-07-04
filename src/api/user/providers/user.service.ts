@@ -57,7 +57,6 @@ export class UserService extends CrudService<User> {
     const user = await this.repository.findOne({
       where: { username: username.toLowerCase() }
     });
-    console.log(user)
     if (forAuth) {
       this.throwUnauthorizedException(user);
     } else {
